@@ -3,6 +3,7 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const auth  = require('../middleware/auth');
 const { selectRow, createNewUser, selectAllData, editUser } = require('../utils/database');
 
 const router = express.Router();
@@ -199,10 +200,11 @@ router.put('/users/:id',[
 // @desc add number
 // @access Private
 router.put('/users/numbers/:id',[
-
-    check('telNumber','tel-number must number').isNumeric(),
-    check('name','please enter name with 5 char').isLength({min: 5}),
-
+    auth,
+    [
+        check('telNumber','tel-number must number').isNumeric(),
+        check('name','please enter name with 5 char').isLength({min: 5}),
+    ]
 ],async (req,res) => {
 
     const errors = validationResult(req);
@@ -212,6 +214,7 @@ router.put('/users/numbers/:id',[
     }
 
     const { telNumber, name } = req.body;
+    const userId = req.params.id;
 
 });
 
