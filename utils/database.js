@@ -45,8 +45,19 @@ const createNewUser = (firstName, lastName, email, age, imageUrl, password) => {
     conn.query(sql);
 }
 
+const editUser = (id,firstName, lastName, age) => {
+    const sql = `UPDATE users SET firstName="` + firstName + `",lastName="` + lastName + `", age="` + age + `" WHERE id="` + id + `")`;
+
+    conn.query(sql,(error,result,field) => {
+        if (error){
+            return console.error(error.message);
+        }
+    });
+}
+
 module.exports = {
     selectAllData,
     selectRow,
-    createNewUser
+    createNewUser,
+    editUser,
 };

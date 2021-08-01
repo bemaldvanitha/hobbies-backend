@@ -3,7 +3,7 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { selectRow, createNewUser, selectAllData } = require('../utils/database');
+const { selectRow, createNewUser, selectAllData, editUser } = require('../utils/database');
 
 const router = express.Router();
 
@@ -170,10 +170,7 @@ router.put('/users/:id',[
 
     check('firstName','first name must not empty').not().isEmpty(),
     check('lastName','last name must not empty').not().isEmpty(),
-    check('email','email must valid').isEmail(),
     check('age','age must number').isNumeric(),
-    check('imageUrl','image url must not empty').not().isEmpty(),
-    check('password','please enter with 6 char').isLength({min: 6}),
 
 ],async (req,res) => {
 
@@ -183,8 +180,19 @@ router.put('/users/:id',[
         return res.status(400).json({errors: errors.array()});
     }
 
-    const { firstName, lastName, email, age, imageUrl, password } = req.body;
+    const { firstName, lastName, age } = req.body;
+    const id = req.params.id;
 
+    try{
+        editUser(id,firstName,lastName,age);
+        return res.status(200).json({
+            msg: 'success'
+        });
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 });
 
 // @route PUT api/users/numbers/:id
