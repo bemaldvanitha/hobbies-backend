@@ -10,6 +10,9 @@ connectDB();
 
 app.use(express.json());
 
+app.use('/api/hobbies',require('./routes/hobbies'));
+app.use('/api',require('./routes/users'));
+
 app.listen(PORT,() => {
     console.log('server running');
 });
