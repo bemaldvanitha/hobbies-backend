@@ -1,0 +1,11 @@
+{
+  "name": "hobbies-backend",
+  "version": "1.0.0",
+  "description": "simple hobbies manage web backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "bemal",
+  "license": "MIT"
+}
