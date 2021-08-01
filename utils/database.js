@@ -10,13 +10,16 @@ const conn = mysql.createConnection({
 const selectAllData = (tableName) => {
     const sql = `SELECT * FROM ` + tableName;
 
-    conn.query(sql,(error,results,fields) => {
+    return new Promise((resolve, reject) => {
+        conn.query(sql,(error,results,fields) => {
 
-        if(error){
-            return console.error(error.message);
-        }
+            if(error){
+                reject(new Error(error.message));
+            }
 
-        return Object.values(JSON.parse(JSON.stringify(results)));
+            const realData = Object.values(JSON.parse(JSON.stringify(results)));
+            resolve(realData);
+        });
     });
 }
 
@@ -28,16 +31,22 @@ const selectRow = (tableName, findByCol, findVal) => {
         conn.query(sql,(error,results,fields) => {
 
             if(error){
-                reject(new Error(error.message))
+                reject(new Error(error.message));
             }
 
             const realData =  Object.values(JSON.parse(JSON.stringify(results)));
             resolve(realData);
         });
-    })
+    });
+}
+
+const createNewUser = (firstName, lastName, email, age, imageUrl, password) => {
+    const sql = `INSERT INTO users (firstName,lastName,email,age,imageUrl,password) VALUES ("` + firstName + `","` + lastName + `","` + email + `","` + age + `","` + imageUrl + `","` + password + `")`;
+    conn.query(sql);
 }
 
 module.exports = {
     selectAllData,
-    selectRow
+    selectRow,
+    createNewUser
 };

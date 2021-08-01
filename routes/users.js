@@ -3,7 +3,7 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { selectRow } = require('../utils/database');
+const { selectRow, createNewUser } = require('../utils/database');
 
 const router = express.Router();
 
@@ -35,7 +35,7 @@ router.post('/signup',[
     check('firstName','first name must not empty').not().isEmpty(),
     check('lastName','last name must not empty').not().isEmpty(),
     check('email','email must valid').isEmail(),
-    check('age','age must number').isNumeric(),
+    check('age','age must number').not().isEmpty(),
     check('imageUrl','image url must not empty').not().isEmpty(),
     check('password','please enter with 6 char').isLength({min: 6}),
 
@@ -61,9 +61,33 @@ router.post('/signup',[
             });
         }
 
-        const salt = await bcrypt.getSalt(10);
+        const salt = await bcrypt.genSalt(10);
         const encryptedPassword = await bcrypt.hash(password,salt);
 
+        createNewUser(firstName,lastName,email,age,imageUrl,encryptedPassword);
+
+        const payload = {
+            user: {
+                email: email
+            }
+        }
+
+        jwt.sign(
+            payload,
+            'bemal',
+            {
+                expiresIn: 3600000
+            },
+            (err,token) => {
+                if(err){
+                    throw err;
+                }
+
+                return res.json({
+                    token: token
+                });
+            }
+        );
 
     }catch (err){
         console.error(err.message);
