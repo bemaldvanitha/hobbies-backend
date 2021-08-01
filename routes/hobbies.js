@@ -1,16 +1,21 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 
+const { selectRow, insertNewHobby, insertExistHobby } = require('../utils/database');
+const auth = require('../middleware/auth');
+
 const router = express.Router();
 
-// @route POST api/hobbies
+// @route POST api/hobbies/:id
 // @desc add hobby
 // @access Private
-router.post('/',[
+router.post('/:id',[
+    auth,
+    [
+        check('name','name must 6 letters').isLength({min: 6}),
+        check('imageUrl','imageUrl must not empty').not().isEmpty(),
 
-    check('name','name must 6 letters').isLength({min: 6}),
-    check('imageUrl','imageUrl must not empty').not().isEmpty(),
-
+    ]
 ],async (req,res) => {
 
     const errors = validationResult(req);
@@ -20,7 +25,28 @@ router.post('/',[
     }
 
     const { name, imageUrl } = req.body;
+    const userId = req.params.id;
 
+    try{
+        const isExist = await selectRow('hobby','name',name);
+
+        if(isExist.length === 0){
+            insertNewHobby(name,imageUrl);
+            const isExist = await selectRow('hobby','name',name);
+            insertExistHobby(userId,isExist[0].id);
+
+        }else{
+            insertExistHobby(userId, isExist[0].id);
+        }
+
+        return res.status(200).json({
+            msg: 'success'
+        });
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 })
 
 // @route GET api/hobbies

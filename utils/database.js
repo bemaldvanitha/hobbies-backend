@@ -50,6 +50,16 @@ const addNumber = (userId, name, number) => {
     conn.query(sql);
 }
 
+const insertNewHobby = (name, imageUrl) => {
+    const sql = `INSERT INTO hobby (name,imageUrl) VALUES ("` + name + `","` + imageUrl + `")`;
+    conn.query(sql);
+}
+
+const insertExistHobby = (userId,hobbyId) => {
+    const sql = `INSERT INTO user_hobbies (userId,hobbyId) VALUES ("` + userId + `","` + hobbyId + `")`;
+    conn.query(sql);
+}
+
 const editUser = (id,firstName, lastName, age) => {
     const sql = `UPDATE users SET firstName="` + firstName + `",lastName="` + lastName + `", age="` + age + `" WHERE id="` + id + `")`;
 
@@ -65,5 +75,7 @@ module.exports = {
     selectRow,
     createNewUser,
     editUser,
-    addNumber
+    addNumber,
+    insertExistHobby,
+    insertNewHobby
 };
