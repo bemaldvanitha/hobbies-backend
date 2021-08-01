@@ -25,6 +25,55 @@ router.post('/signin',[
 
     const { email, password } = req.body;
 
+    try{
+
+        let isExist = await selectRow("users","email",email);
+
+        if(isExist.length === 0){
+            return res.status(400).json({
+                errors: [
+                    { msg: 'email or password error' }
+                ]
+            });
+        }
+
+        const isMatch = await bcrypt.compare(password, isExist[0].password);
+
+        if(!isMatch){
+            return res.status(400).json({
+                errors: [
+                    { msg: 'email or password error 1' }
+                ]
+            });
+        }
+
+        const payload = {
+            user: {
+                email: email
+            }
+        }
+
+        jwt.sign(
+            payload,
+            'bemal',
+            {
+                expiresIn: 3600000
+            },
+            (err,token) => {
+                if(err){
+                    throw err;
+                }
+
+                return res.json({
+                    token: token
+                });
+            }
+        );
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 });
 
 // @route POST api/signup
@@ -63,6 +112,7 @@ router.post('/signup',[
 
         const salt = await bcrypt.genSalt(10);
         const encryptedPassword = await bcrypt.hash(password,salt);
+        console.log(encryptedPassword);
 
         createNewUser(firstName,lastName,email,age,imageUrl,encryptedPassword);
 
