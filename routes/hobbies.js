@@ -1,7 +1,7 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 
-const { selectRow, insertNewHobby, insertExistHobby } = require('../utils/database');
+const { selectRow, insertNewHobby, insertExistHobby, selectAllData } = require('../utils/database');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -49,11 +49,35 @@ router.post('/:id',[
     }
 })
 
-// @route GET api/hobbies
+// @route GET api/hobbies/:id
 // @desc get all hobbies
-// @access Public
-router.get('/',(req,res) => {
+// @access Private
+router.get('/:id',auth,async (req,res) => {
+    const userId = req.params.id;
 
+    try {
+
+        const currentHobbies = [];
+        const allHobbies = await selectAllData('hobby');
+        const allUserHobbies = await selectAllData('user_hobbies');
+        const currentUserHobbyIds = allUserHobbies.filter(hobby => hobby.userId.toString() === userId);
+
+        allHobbies.map(hobby => {
+           const hobbyId = hobby.id;
+           const isCurrentsFav = currentUserHobbyIds.findIndex(hobby => hobby.hobbyId.toString() === hobbyId.toString());
+           if(isCurrentsFav !== -1){
+               currentHobbies.push(hobby);
+           }
+        });
+
+        return res.status(200).json({
+            hobbies: currentHobbies
+        })
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 });
 
 // @route PUT api/hobbies/:id
