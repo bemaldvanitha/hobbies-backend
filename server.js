@@ -1,12 +1,12 @@
 const express = require('express');
 
-const connectDB = require('./utils/database');
+//const { connectDB } = require('./utils/database');
 
 const PORT = process.env.PORT || 5000;
 
 const app = express();
 
-connectDB();
+//connectDB();
 
 app.use(express.json());
 

@@ -1,5 +1,9 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const { selectRow } = require('../utils/database');
 
 const router = express.Router();
 
@@ -44,6 +48,27 @@ router.post('/signup',[
     }
 
     const { firstName, lastName, email, age, imageUrl, password } = req.body;
+
+    try{
+
+        let isExist = await selectRow("users","email",email);
+
+        if(isExist.length > 0){
+            return res.status(400).json({
+                errors: [
+                    { msg: 'User already exists' }
+                ]
+            });
+        }
+
+        const salt = await bcrypt.getSalt(10);
+        const encryptedPassword = await bcrypt.hash(password,salt);
+
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 
 });
 
