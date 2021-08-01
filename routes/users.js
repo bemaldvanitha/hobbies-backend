@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const auth  = require('../middleware/auth');
-const { selectRow, createNewUser, selectAllData, editUser } = require('../utils/database');
+const { selectRow, createNewUser, selectAllData, editUser, addNumber } = require('../utils/database');
 
 const router = express.Router();
 
@@ -216,6 +216,17 @@ router.put('/users/numbers/:id',[
     const { telNumber, name } = req.body;
     const userId = req.params.id;
 
+    try{
+
+        addNumber(userId,name,telNumber);
+        return res.status(200).json({
+            msg: 'success'
+        });
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 });
 
 module.exports = router;
