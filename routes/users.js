@@ -3,7 +3,7 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { selectRow, createNewUser } = require('../utils/database');
+const { selectRow, createNewUser, selectAllData } = require('../utils/database');
 
 const router = express.Router();
 
@@ -112,7 +112,6 @@ router.post('/signup',[
 
         const salt = await bcrypt.genSalt(10);
         const encryptedPassword = await bcrypt.hash(password,salt);
-        console.log(encryptedPassword);
 
         createNewUser(firstName,lastName,email,age,imageUrl,encryptedPassword);
 
@@ -150,7 +149,18 @@ router.post('/signup',[
 // @desc get all users
 // @access Public
 router.get('/users',async (req,res) => {
+    try{
 
+        const allUsers = await selectAllData('users');
+        console.log(allUsers);
+        return res.status(200).json({
+            users: allUsers
+        })
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 });
 
 // @route PUT api/users/:id
