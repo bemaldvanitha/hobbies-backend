@@ -70,6 +70,17 @@ const editUser = (id,firstName, lastName, age) => {
     });
 }
 
+const deleteUserHobby = (userId,hobbyId) => {
+    const sql = `DELETE FROM user_hobbies WHERE userId="` + userId + `" AND hobbyId="` + hobbyId + `"`;
+
+    conn.query(sql,(error,result,fields) => {
+        if (error){
+            return console.error(error.message);
+        }
+        console.log(result)
+    });
+}
+
 module.exports = {
     selectAllData,
     selectRow,
@@ -77,5 +88,6 @@ module.exports = {
     editUser,
     addNumber,
     insertExistHobby,
-    insertNewHobby
+    insertNewHobby,
+    deleteUserHobby
 };

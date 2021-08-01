@@ -1,7 +1,7 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 
-const { selectRow, insertNewHobby, insertExistHobby, selectAllData } = require('../utils/database');
+const { selectRow, insertNewHobby, insertExistHobby, selectAllData, deleteUserHobby } = require('../utils/database');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -100,11 +100,24 @@ router.put('/:id',[
 
 });
 
-// @route DELETE api/hobbies/:id
+// @route DELETE api/hobbies/:userid/:hobbyid
 // @desc delete hobby
 // @access Private
-router.delete('/:id',(req,res)=> {
+router.delete('/:userid/:hobbyid',auth,(req,res)=> {
+    const userId = req.params.userid;
+    const hobbyId = req.params.hobbyid;
 
+    try{
+
+        deleteUserHobby(userId,hobbyId);
+        return res.status(200).json({
+            msg: 'success'
+        });
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 });
 
 module.exports = router;
