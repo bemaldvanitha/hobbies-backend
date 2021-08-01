@@ -6,7 +6,20 @@ const router = express.Router();
 // @route POST api/hobbies
 // @desc add hobby
 // @access Private
-router.post('/',(req,res) => {
+router.post('/',[
+
+    check('name','name must 6 letters').isLength({min: 6}),
+    check('imageUrl','imageUrl must not empty').not().isEmpty(),
+
+],async (req,res) => {
+
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        return res.status(400).json({errors: errors.array()});
+    }
+
+    const { name, imageUrl } = req.body;
 
 })
 
@@ -20,7 +33,20 @@ router.get('/',(req,res) => {
 // @route PUT api/hobbies/:id
 // @desc edit hobby
 // @access Private
-router.put('/:id',(req,res)=> {
+router.put('/:id',[
+
+    check('name','name must 6 letters').isLength({min: 6}),
+    check('imageUrl','imageUrl must not empty').not().isEmpty(),
+
+],async (req,res)=> {
+
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        return res.status(400).json({errors: errors.array()});
+    }
+
+    const { name, imageUrl } = req.body;
 
 });
 
