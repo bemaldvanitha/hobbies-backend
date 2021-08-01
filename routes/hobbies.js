@@ -1,7 +1,7 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 
-const { selectRow, insertNewHobby, insertExistHobby, selectAllData, deleteUserHobby } = require('../utils/database');
+const { selectRow, insertNewHobby, insertExistHobby, selectAllData, deleteUserHobby, editHobby } = require('../utils/database');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -84,10 +84,10 @@ router.get('/:id',auth,async (req,res) => {
 // @desc edit hobby
 // @access Private
 router.put('/:id',[
-
-    check('name','name must 6 letters').isLength({min: 6}),
-    check('imageUrl','imageUrl must not empty').not().isEmpty(),
-
+    auth,
+    [
+        check('name','name must 6 letters').isLength({min: 6}),
+    ]
 ],async (req,res)=> {
 
     const errors = validationResult(req);
@@ -96,8 +96,20 @@ router.put('/:id',[
         return res.status(400).json({errors: errors.array()});
     }
 
-    const { name, imageUrl } = req.body;
+    const { name } = req.body;
+    const userId = req.params.id;
 
+    try {
+
+        editHobby(userId,name);
+        return res.status(200).json({
+            msg: 'success'
+        });
+
+    }catch (err){
+        console.error(err.message);
+        return res.status(500).send('Server error');
+    }
 });
 
 // @route DELETE api/hobbies/:userid/:hobbyid

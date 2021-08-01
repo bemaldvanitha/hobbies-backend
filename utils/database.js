@@ -61,7 +61,17 @@ const insertExistHobby = (userId,hobbyId) => {
 }
 
 const editUser = (id,firstName, lastName, age) => {
-    const sql = `UPDATE users SET firstName="` + firstName + `",lastName="` + lastName + `", age="` + age + `" WHERE id="` + id + `")`;
+    const sql = `UPDATE users SET firstName="` + firstName + `",lastName="` + lastName + `", age="` + age + `" WHERE id="` + id + `"`;
+
+    conn.query(sql,(error,result,field) => {
+        if (error){
+            return console.error(error.message);
+        }
+    });
+}
+
+const editHobby = (id, name) => {
+    const sql = `UPDATE hobby SET name="` + name + `" WHERE id="` + id + `"`;
 
     conn.query(sql,(error,result,field) => {
         if (error){
@@ -89,5 +99,6 @@ module.exports = {
     addNumber,
     insertExistHobby,
     insertNewHobby,
-    deleteUserHobby
+    deleteUserHobby,
+    editHobby
 };
