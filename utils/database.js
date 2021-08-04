@@ -42,7 +42,19 @@ const selectRow = (tableName, findByCol, findVal) => {
 
 const createNewUser = (firstName, lastName, email, age, imageUrl, password) => {
     const sql = `INSERT INTO users (firstName,lastName,email,age,imageUrl,password) VALUES ("` + firstName + `","` + lastName + `","` + email + `","` + age + `","` + imageUrl + `","` + password + `")`;
-    conn.query(sql);
+
+    return new Promise((resolve, reject) => {
+        conn.query(sql,(error,results,fields) => {
+
+            if(error){
+                reject(new Error(error.message));
+            }
+
+            const realData =  Object.values(JSON.parse(JSON.stringify(results)));
+            console.log(realData)
+            resolve(realData);
+        });
+    })
 }
 
 const addNumber = (userId, name, number) => {

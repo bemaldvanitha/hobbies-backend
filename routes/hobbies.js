@@ -8,14 +8,12 @@ const router = express.Router();
 
 // @route POST api/hobbies/:id
 // @desc add hobby
-// @access Private
+// @access Public
 router.post('/:id',[
-    auth,
-    [
+
         check('name','name must 6 letters').isLength({min: 6}),
         check('imageUrl','imageUrl must not empty').not().isEmpty(),
-
-    ]
+		
 ],async (req,res) => {
 
     const errors = validationResult(req);
@@ -34,14 +32,20 @@ router.post('/:id',[
             insertNewHobby(name,imageUrl);
             const isExist = await selectRow('hobby','name',name);
             insertExistHobby(userId,isExist[0].id);
+			
+			return res.status(200).json({
+				msg: 'success',
+				id: isExist[0].id
+			});
 
         }else{
             insertExistHobby(userId, isExist[0].id);
+			
+			return res.status(200).json({
+				msg: 'success',
+				id: isExist[0].id
+			});
         }
-
-        return res.status(200).json({
-            msg: 'success'
-        });
 
     }catch (err){
         console.error(err.message);
@@ -51,8 +55,8 @@ router.post('/:id',[
 
 // @route GET api/hobbies/:id
 // @desc get all hobbies
-// @access Private
-router.get('/:id',auth,async (req,res) => {
+// @access Public
+router.get('/:id',async (req,res) => {
     const userId = req.params.id;
 
     try {
@@ -82,12 +86,11 @@ router.get('/:id',auth,async (req,res) => {
 
 // @route PUT api/hobbies/:id
 // @desc edit hobby
-// @access Private
+// @access Public
 router.put('/:id',[
-    auth,
-    [
+
         check('name','name must 6 letters').isLength({min: 6}),
-    ]
+
 ],async (req,res)=> {
 
     const errors = validationResult(req);
@@ -115,7 +118,7 @@ router.put('/:id',[
 // @route DELETE api/hobbies/:userid/:hobbyid
 // @desc delete hobby
 // @access Private
-router.delete('/:userid/:hobbyid',auth,(req,res)=> {
+router.delete('/:userid/:hobbyid',(req,res)=> {
     const userId = req.params.userid;
     const hobbyId = req.params.hobbyid;
 

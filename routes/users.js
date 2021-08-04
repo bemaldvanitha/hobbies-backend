@@ -30,6 +30,7 @@ router.post('/signin',[
 
         let isExist = await selectRow("users","email",email);
 
+        //console.log(isExist[0].id);
         if(isExist.length === 0){
             return res.status(400).json({
                 errors: [
@@ -66,7 +67,8 @@ router.post('/signin',[
                 }
 
                 return res.json({
-                    token: token
+                    token: token,
+                    id: isExist[0].id
                 });
             }
         );
@@ -94,6 +96,8 @@ router.post('/signup',[
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
+		console.log('field error');
+		console.log(errors);
         return res.status(400).json({errors: errors.array()});
     }
 
@@ -114,13 +118,15 @@ router.post('/signup',[
         const salt = await bcrypt.genSalt(10);
         const encryptedPassword = await bcrypt.hash(password,salt);
 
-        createNewUser(firstName,lastName,email,age,imageUrl,encryptedPassword);
+        await createNewUser(firstName,lastName,email,age,imageUrl,encryptedPassword);
 
         const payload = {
             user: {
                 email: email
             }
         }
+
+        let isExisting = await selectRow("users","email",email);
 
         jwt.sign(
             payload,
@@ -134,7 +140,8 @@ router.post('/signup',[
                 }
 
                 return res.json({
-                    token: token
+                    token: token,
+                    id: isExisting[0].id
                 });
             }
         );
@@ -198,13 +205,12 @@ router.put('/users/:id',[
 
 // @route PUT api/users/numbers/:id
 // @desc add number
-// @access Private
+// @access Public
 router.put('/users/numbers/:id',[
-    auth,
-    [
+
         check('telNumber','tel-number must number').isNumeric(),
         check('name','please enter name with 5 char').isLength({min: 5}),
-    ]
+		
 ],async (req,res) => {
 
     const errors = validationResult(req);
